@@ -35,7 +35,7 @@ app.add_middleware(
 # A열 user_id / B열 password / C열 name
 # =========================================================
 
-SERVICE_ACCOUNT_FILE = "credentials.json"
+SERVICE_ACCOUNT_FILE = "/etc/secrets/credentials.json"
 SPREADSHEET_ID = "1geMh_An9ZJtOZDAysXqan55JCiOAIp_LX5WHVJYcUG4"
 SHEET_NAME = "users"
 SHEET_NAME = "users"

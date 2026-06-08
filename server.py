@@ -59,10 +59,10 @@ reader = None
 # =========================================================
 
 def connect_sheet():
-    global sheet
+    global sheet, save_sheet
 
-    if sheet is not None:
-        return sheet
+    if sheet is not None and save_sheet is not None:
+        return sheet, save_sheet
 
     if not os.path.exists(SERVICE_ACCOUNT_FILE):
         raise FileNotFoundError("credentials.json 파일이 없습니다.")

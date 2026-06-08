@@ -585,12 +585,6 @@ async def get_documents(user_id: str):
             "documents": []
         }
 
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8001)
-
 @app.get("/get_documents")
 async def get_documents(user_id: str):
 
@@ -618,3 +612,8 @@ async def get_documents(user_id: str):
             "success": False,
             "message": str(e)
         }
+    
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8001)))

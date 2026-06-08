@@ -584,28 +584,3 @@ async def get_documents(user_id: str):
             "message": f"문서 목록 불러오기 오류: {e}",
             "documents": []
         }
-
-@app.get("/get_documents")
-async def get_documents(user_id: str):
-
-    try:
-        _, ws_save = connect_sheet()
-
-        records = ws_save.get_all_records()
-
-        user_docs = []
-
-        for row in records:
-            if str(row.get("user_id", "")).strip() == user_id.strip():
-                user_docs.append(row)
-
-        return {
-            "success": True,
-            "documents": user_docs
-        }
-
-    except Exception as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }

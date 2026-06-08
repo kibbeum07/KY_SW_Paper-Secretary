@@ -408,8 +408,12 @@ async def analyze_document(
             temp_path = temp_file.name
 
         ocr_reader = get_ocr_reader()
-        processed_path = preprocess_image(file_path)
-        result = reader.readtext(processed_path, detail=0, paragraph=True)
+        processed_path = preprocess_image(temp_path)
+        ocr_results = ocr_reader.readtext(
+            processed_path,
+            detail=0,
+            paragraph=True
+            )
         text = "\n".join(ocr_results)
 
         final_document_type = classify_document(text, document_type)
@@ -528,9 +532,7 @@ async def save_document(
     ocr_text: str = Form("")
 ):
     try:
-        ws_save = connect_sheet()
-        spreadsheet = ws_save.spreadsheet
-        ws_save = spreadsheet.worksheet(SAVE_SHEET_NAME)
+        _, ws_save = connect_sheet()
 
         created_at = datetime.now().strftime("%Y-%m-%d %H:%M")
 
@@ -562,9 +564,7 @@ async def root():
 @app.get("/get_documents")
 async def get_documents(user_id: str):
     try:
-        ws = connect_sheet()
-        spreadsheet = ws.spreadsheet
-        ws_save = spreadsheet.worksheet(SAVE_SHEET_NAME)
+        _, ws_save = connect_sheet()
 
         records = ws_save.get_all_records()
 
@@ -589,10 +589,7 @@ async def get_documents(user_id: str):
 async def get_documents(user_id: str):
 
     try:
-        ws_save = connect_sheet()
-
-        spreadsheet = ws_save.spreadsheet
-        ws_save = spreadsheet.worksheet(SAVE_SHEET_NAME)
+        _, ws_save = connect_sheet()
 
         records = ws_save.get_all_records()
 
@@ -612,8 +609,3 @@ async def get_documents(user_id: str):
             "success": False,
             "message": str(e)
         }
-    
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8001)))

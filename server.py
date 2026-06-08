@@ -9,6 +9,7 @@ import gspread
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
+import cv2
 
 # =========================================================
 # 종이 비서 백엔드 서버
@@ -119,12 +120,7 @@ def load_users_from_sheet():
 
 @app.on_event("startup")
 def startup_event():
-    try:
-        load_users_from_sheet()
-        print(f"회원정보 캐시 로딩 완료: {len(user_cache)}명")
-    except Exception as e:
-        print(f"구글 시트 연결 실패: {e}")
-        print("서버는 실행되지만 로그인/회원가입은 실패할 수 있습니다.")
+    print("서버 시작 완료")
 
 
 # =========================================================

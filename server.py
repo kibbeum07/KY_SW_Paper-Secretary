@@ -137,7 +137,7 @@ def extract_text_with_gemini(image_path: str) -> str:
 
     image = Image.open(image_path)
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash")
 
     response = model.generate_content([
         "이 이미지 안의 모든 글자를 OCR처럼 최대한 정확히 한국어로 추출해줘. 설명은 하지 말고 추출된 텍스트만 출력해줘.",

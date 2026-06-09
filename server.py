@@ -472,7 +472,8 @@ async def analyze_multi_document(
             "page_count": len(files),
         }
 
-    except Exception as e:
+     except Exception as e:
+        print("analyze_multi 오류:", repr(e))
         return {
             "success": False,
             "ocr_text": "",
@@ -480,7 +481,7 @@ async def analyze_multi_document(
             "key_info": {},
             "risk_level": "오류",
             "risk_message": str(e),
-            "summary": "여러 장 문서 분석 중 오류가 발생했습니다.",
+            "summary": str(e),
             "page_count": 0,
         }
 

@@ -432,7 +432,6 @@ async def analyze_multi_document(
 ):
     try:
         all_texts = []
-        ocr_reader = get_ocr_reader()
 
         for index, file in enumerate(files):
             image_bytes = await file.read()

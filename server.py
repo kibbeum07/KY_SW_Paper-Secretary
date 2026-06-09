@@ -474,8 +474,8 @@ async def analyze_multi_document(
                 temp_path,
                 detail=0,
                 paragraph=True,
-                width_ths=0.8,
-                mag_ratio=2.0,
+                width_ths=0.7,
+                mag_ratio=1.0,
             )
 
             page_text = "\n".join(ocr_results)

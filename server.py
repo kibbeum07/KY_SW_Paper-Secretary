@@ -472,7 +472,7 @@ async def analyze_multi_document(
             "page_count": len(files),
         }
 
-     except Exception as e:
+    except Exception as e:
         print("analyze_multi 오류:", repr(e))
         return {
             "success": False,

@@ -4,12 +4,12 @@ import tempfile
 from typing import Dict, Tuple
 from datetime import datetime
 
-import easyocr
 import gspread
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from google.oauth2.service_account import Credentials
-import cv2
+import google.generativeai as genai
+from PIL import Image
 
 # =========================================================
 # 종이 비서 백엔드 서버
@@ -127,45 +127,24 @@ def startup_event():
 # OCR 설정
 # =========================================================
 
-def get_ocr_reader():
-    global reader
+def extract_text_with_gemini(image_path: str) -> str:
+    api_key = os.environ.get("GOOGLE_API_KEY")
 
-    if reader is None:
-        reader = easyocr.Reader(["ko", "en"], gpu=False)
+    if not api_key:
+        raise ValueError("GOOGLE_API_KEY 환경변수가 없습니다.")
 
-    return reader
+    genai.configure(api_key=api_key)
 
-def preprocess_image(image_path):
-    image = cv2.imread(image_path)
+    image = Image.open(image_path)
 
-    if image is None:
-        return image_path
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    response = model.generate_content([
+        "이 이미지 안의 모든 글자를 OCR처럼 최대한 정확히 한국어로 추출해줘. 설명은 하지 말고 추출된 텍스트만 출력해줘.",
+        image
+    ])
 
-    gray = cv2.resize(
-        gray,
-        None,
-        fx=1.5,
-        fy=1.5,
-        interpolation=cv2.INTER_CUBIC
-    )
-
-    gray = cv2.GaussianBlur(gray, (3, 3), 0)
-
-    processed = cv2.adaptiveThreshold(
-        gray,
-        255,
-        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        cv2.THRESH_BINARY,
-        31,
-        10
-    )
-
-    output_path = image_path + "_processed.jpg"
-    cv2.imwrite(output_path, processed)
-
-    return output_path
+    return response.text.strip()
 
 # =========================================================
 # 로그인
@@ -406,16 +385,8 @@ async def analyze_document(
         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
             temp_file.write(image_bytes)
             temp_path = temp_file.name
-
-        ocr_reader = get_ocr_reader()
-        processed_path = preprocess_image(temp_path)
-        ocr_results = ocr_reader.readtext(
-            processed_path,
-            detail=0,
-            paragraph=True
-            )
-        text = "\n".join(ocr_results)
-
+            
+        text = extract_text_with_gemini(temp_path)
         final_document_type = classify_document(text, document_type)
         key_info = extract_key_info(text, final_document_type)
 
@@ -470,15 +441,7 @@ async def analyze_multi_document(
                 temp_file.write(image_bytes)
                 temp_path = temp_file.name
 
-            ocr_results = ocr_reader.readtext(
-                temp_path,
-                detail=0,
-                paragraph=True,
-                width_ths=0.7,
-                mag_ratio=1.0,
-            )
-
-            page_text = "\n".join(ocr_results)
+            page_text = extract_text_with_gemini(temp_path)
             all_texts.append(f"[{index + 1}쪽]\n{page_text}")
 
         text = "\n\n".join(all_texts)

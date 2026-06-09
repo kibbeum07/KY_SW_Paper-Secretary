@@ -1,7 +1,7 @@
 fastapi
 uvicorn
-easyocr
 gspread
 google-auth
-opencv-python-headless
 python-multipart
+google-generativeai
+pillow
